@@ -106,15 +106,17 @@ dev.off()
 
 ggplot() +
   geom_raster(data = hex_points, aes(x = x, y = y, fill = n),
-    show.legend = FALSE) +
+              show.legend = FALSE) +
   geom_polygon(data = hex_poly, aes(x, y), color = high_color, alpha = 0,
-    size = 2.12) +
-  annotation_custom(g, xmin = -0.95, xmax = 0.95, ymin = -0.85, ymax = 0.85) +
+               size =  2.12) +
+  annotate("text", x = 0, y = 0.66, label= "CamaraBR",
+           size = 8, family = "Roboto", fontface="bold") + 
+  annotation_custom(g, xmin = -1.05, xmax = 1.05, ymin = -1.15, ymax = 1.0) +
   coord_equal(xlim = range(hex_poly$x), ylim = range(hex_poly$y)) +
   scale_x_continuous(expand = c(0.04, 0)) +
   scale_y_continuous(expand = c(0.04, 0)) +
   scale_fill_gradient(low = low_color, high = high_color) +
-  theme_hex -> icon_192
+  theme_hex ->  icon_192
 
 png("~/CamaraBR/inst/doc/CamaraBR-icon-192.png", width = 192, height = 192, bg = "transparent")
 print(icon_192)
