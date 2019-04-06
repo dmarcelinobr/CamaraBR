@@ -59,8 +59,11 @@ hex_points <- left_join(hex_points, gen_data, by = c("x" = "...1", "y" = "...2")
 theme_hex <- theme_void() + theme_transparent() +
   theme(axis.ticks.length = unit(0, "mm"))
 
-img <- readPNG("~/CamaraBR/inst/doc/camara2.png")
+img <- readPNG("~/CamaraBR/inst/doc/camara.png")
 g <- rasterGrob(img, interpolate=TRUE)
+
+flag <- readPNG("~/CamaraBR/inst/doc/bandeira.png")
+b <- rasterGrob(flag, interpolate=TRUE)
 
 plot_sample <- hex_points %>%
   uncount(weights = n) %>%
@@ -74,6 +77,7 @@ ggplot() +
   annotate("text", x = 0, y = 0.66, label= "CamaraBR",
            size = 44, family = "Roboto", fontface="bold") + 
   annotation_custom(g, xmin = -1.05, xmax = 1.05, ymin = -1.15, ymax = 1.0) +
+  annotation_custom(b, xmin = -0.25, xmax = 0.22, ymin = -1.35, ymax = 0.40) +
   coord_equal(xlim = range(hex_poly$x), ylim = range(hex_poly$y)) +
   scale_x_continuous(expand = c(0.04, 0)) +
   scale_y_continuous(expand = c(0.04, 0)) +
@@ -93,6 +97,7 @@ ggplot() +
   annotate("text", x = 0, y = 0.66, label= "CamaraBR",
            size = 1.3, family = "Roboto", fontface="bold") + 
   annotation_custom(g, xmin = -1.05, xmax = 1.05, ymin = -1.15, ymax = 1.0) +
+  annotation_custom(b, xmin = -0.25, xmax = 0.22, ymin = -1.25, ymax = 0.40) +
   coord_equal(xlim = range(hex_poly$x), ylim = range(hex_poly$y)) +
   scale_x_continuous(expand = c(0.04, 0)) +
   scale_y_continuous(expand = c(0.04, 0)) +
@@ -112,6 +117,7 @@ ggplot() +
   annotate("text", x = 0, y = 0.66, label= "CamaraBR",
            size = 8, family = "Roboto", fontface="bold") + 
   annotation_custom(g, xmin = -1.05, xmax = 1.05, ymin = -1.15, ymax = 1.0) +
+  annotation_custom(b, xmin = -0.25, xmax = 0.22, ymin = -1.25, ymax = 0.40) +
   coord_equal(xlim = range(hex_poly$x), ylim = range(hex_poly$y)) +
   scale_x_continuous(expand = c(0.04, 0)) +
   scale_y_continuous(expand = c(0.04, 0)) +
