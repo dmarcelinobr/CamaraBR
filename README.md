@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# CamaraBR <img src="inst/doc/CamaraBR-logo.png" width="240px" align="right" />
+# CamaraBR <img src="inst/figures/CamaraBR-logo.png" width="240px" align="right" />
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Build
