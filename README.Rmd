@@ -45,6 +45,20 @@ library(CamaraBR)
 data2020 <- buildRollcallDataset(year = 2020)
 
 
+
+
+siglaTipo = c("MPV", "MSC", "PDC", "PDL", "PEC", "PL", "PLS", "PLN", "PLP", "REC", "REQ")
+
+
+# Limpando a base
+base <- transformVotes(data2020, filter = TRUE)
+
+# Votações válidas no ano para o nosso cálculo
+base %>%
+  # filter(!is.na(GOV_orientation)) %>%
+  distinct(rollcall_id) %>%
+  nrow()
+
 ```
 
 
@@ -65,6 +79,8 @@ proposals <- purrr::map_df(anos,
                            loadCamaraProposals(.x)
                            })
 
+
+proposals %>% count(type_bill)
 
 # fwrite(proposals, file = "data/proposals.txt")
 

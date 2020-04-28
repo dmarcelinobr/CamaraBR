@@ -1,6 +1,7 @@
 ^README\.Rmd$
 src/copies
 tests/old
+data/*.txt
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.Rapp.history$

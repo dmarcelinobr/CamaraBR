@@ -7,6 +7,7 @@
 buildRollcallDataset(
   year = 2020,
   type = "",
+  download = TRUE,
   ascii = FALSE,
   outfile = "cham_data_votes/data_"
 )
@@ -15,6 +16,8 @@ buildRollcallDataset(
 \item{year}{an itneger the year querying}
 
 \item{type}{a string for querying a particular type of bill}
+
+\item{download}{a logical, if TRUE it will download a database of bills before combining all data}
 
 \item{ascii}{a logical}
 

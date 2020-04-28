@@ -4,6 +4,7 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c(".votacoesPlenarioCamar
 #' 
 #' @param year an itneger the year querying
 #' @param type a string for querying a particular type of bill
+#' @param download  a logical, if TRUE it will download a database of bills before combining all data 
 #' @param ascii a logical
 #' @param outfile folder and name for the file
 #'
@@ -27,7 +28,7 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c(".votacoesPlenarioCamar
 #' 
 #' @export
 #' @rdname buildRollcallDataset
-buildRollcallDataset <- function (year = 2020, type = "", ascii = FALSE, outfile = "cham_data_votes/data_") {
+buildRollcallDataset <- function (year = 2020, type = "", download = TRUE, ascii = FALSE, outfile = "cham_data_votes/data_") {
 
   "This function lists every bill voted on in plenary."
   if (is.null(year)) {
@@ -38,7 +39,9 @@ buildRollcallDataset <- function (year = 2020, type = "", ascii = FALSE, outfile
     stop("Orientation information is only available from 2003 onwards")
   }
 
-.proposalDetails <- purrr::map_df(1988:year,~{loadCamaraProposals(.x)})
+  if (download == TRUE) {
+    .proposalDetails <- purrr::map_df(1988:year,~{loadCamaraProposals(.x)})
+  }
 
 .votacoesPlenarioCamara <- loadVotacoesOrientacoesCamara(year = year);
 
@@ -47,8 +50,7 @@ buildRollcallDataset <- function (year = 2020, type = "", ascii = FALSE, outfile
 .rollcallData <- dplyr::left_join(.votacoesPlenarioVotos, .votacoesPlenarioCamara)
 
 .data <- dplyr::left_join(.rollcallData, .proposalDetails) %>% 
-  dplyr::select(bill_id, rollcall_id, type_bill, number_bill, year_bill, decision_summary, decision_date, decision_time, rollcall_subject, rollcall_keywords, legislator_name, legislator_party, legislator_state, legislator_vote, sigla_orgao, sigla_bancada, orientation)
-
+  dplyr::select(bill_id, rollcall_id, type_bill, number_bill, year_bill, decision_summary, decision_date, decision_time, rollcall_subject, rollcall_keywords, legislator_id, legislator_name, legislator_party, legislator_state, legislator_vote, sigla_orgao, sigla_bancada, orientation)
 
 if (ascii == TRUE) {
 .data <- .data %>% dplyr::mutate_if(is.character, function(x) stringi::stri_trans_general(x, "Latin-ASCII"))
