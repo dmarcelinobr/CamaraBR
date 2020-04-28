@@ -5,7 +5,7 @@
 \alias{proposals}
 \title{A dataframe of Brazilian Chamber proposals.}
 \format{
-A data frame with 567833 rows and 5 variables
+A data frame with 52049 rows and 5 variables
 }
 \usage{
 proposals

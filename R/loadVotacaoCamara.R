@@ -1,4 +1,4 @@
-if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao"))
+if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "decision_time", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao"))
 
 #' Load deputie's roll-call votes 
 #'
@@ -41,7 +41,7 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill",
                   number_bill = numero,
                   rollcall_keywords = keywords,
                   rollcall_subject = ementa) %>% 
-    dplyr::select(bill_id, type_bill, year_bill, rollcall_subject, rollcall_keywords)
+    dplyr::select(bill_id, type_bill, year_bill, number_bill, rollcall_subject, rollcall_keywords)
   return(.proposals)
 }
 
@@ -64,6 +64,7 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill",
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom stringr str_replace
+#' @importFrom stringr str_extract
 #' @rdname loadVotacoesOrientacoesCamara
 #' @export
 `loadVotacoesOrientacoesCamara` <- function(year){
@@ -78,14 +79,17 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill",
 
   .file <- paste0("https://dadosabertos.camara.leg.br/arquivos/votacoesOrientacoes/csv/votacoesOrientacoes-", year, ".csv")
   
+message(paste0("\nDownloading rollcall orientation for proposals of ", year))
+  
 .votacoesOrientacoes <- data.table::fread(.file, colClasses = 'character', data.table = FALSE) %>% 
+   dplyr::mutate(bill_id = stringr::str_extract(idVotacao,".+?(?=-)")) %>%
     dplyr::rename(rollcall_id = idVotacao,
                  uri_votacao = uriVotacao, 
                  orientation = orientacao,
                 decision_summary = descricao,
                 sigla_orgao = siglaOrgao,
                 sigla_bancada = siglaBancada) %>%
-  dplyr::select(rollcall_id, decision_summary, sigla_orgao, sigla_bancada, orientation, uri_votacao)
+  dplyr::select(bill_id, rollcall_id, decision_summary, sigla_orgao, sigla_bancada, orientation, uri_votacao)
 return(.votacoesOrientacoes)
   }
 NULL
@@ -110,6 +114,7 @@ NULL
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom stringr str_replace
+#' @importFrom stringr str_extract
 #' 
 #' @rdname loadVotacoesCamara
 #' @export
@@ -130,15 +135,19 @@ NULL
       ".csv"
     )
 
+  message(paste0("\nDownloading rollcall votes for proposals of ", year))
+  
 .votacoesVotos <- data.table::fread(.file, colClasses = 'character', data.table = FALSE) %>%
-  dplyr::mutate(decision_date = as.Date(stringr::str_replace(dataHoraVoto, 'T+', ' '))) %>% # dplyr::mutate(decision_time = (stringr::str_replace(dataHoraVoto, 'T+', ' '))) %>%
+dplyr::mutate(decision_date = as.Date(stringr::str_replace(dataHoraVoto, 'T+', ' '))) %>%
+dplyr::mutate(decision_time = stringr::str_extract(dataHoraVoto, '(?<=T).+')) %>%
+  dplyr::mutate(bill_id = stringr::str_extract(idVotacao,".+?(?=-)")) %>%
     dplyr::rename(rollcall_id = idVotacao,
                   legislator_id = deputado_id,
                   legislator_name = deputado_nome,
                   legislator_party = deputado_siglaPartido, 
                   legislator_state = deputado_siglaUf,
                   legislator_vote = voto) %>% 
-  dplyr::select(rollcall_id, decision_date, legislator_vote, legislator_id, legislator_name, legislator_party, legislator_state)
+  dplyr::select(bill_id, rollcall_id, decision_date, decision_time, legislator_vote, legislator_id, legislator_name, legislator_party, legislator_state)
 return(.votacoesVotos)
 }
 NULL

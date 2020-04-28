@@ -1,4 +1,4 @@
-if (getRversion() >= "2.15.1")  utils::globalVariables(c(".votacoesPlenarioCamara", ".votacoesPlenarioVotos", ".data", "ano", "decision_date"))
+if (getRversion() >= "2.15.1")  utils::globalVariables(c(".votacoesPlenarioCamara", ".votacoesPlenarioVotos", ".data", ".rollcallData", ".proposalDetails", "ano", "decision_date"))
 
 #' Fetch bills discussed and voted on the plenary
 #' 
@@ -13,6 +13,7 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c(".votacoesPlenarioCamar
 #' @importFrom magrittr "%>%"
 #' @importFrom dplyr mutate_if
 #' @importFrom dplyr mutate
+#' @importFrom dplyr select
 #' @importFrom dplyr rename
 #' @importFrom dplyr filter
 #' @importFrom lubridate year
@@ -20,6 +21,7 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c(".votacoesPlenarioCamar
 #' @importFrom rlang enquo
 #' @importFrom rlang quo_name
 #' @importFrom rlang :=
+#' @importFrom utils data
 #' @examples 
 #' # data <- buildRollcallDataset(year=2020)
 #' 
@@ -35,11 +37,18 @@ buildRollcallDataset <- function (year = 2020, type = "", ascii = FALSE, outfile
   if (year < 2003) {
     stop("Orientation information is only available from 2003 onwards")
   }
-  
+
+.proposalDetails <- purrr::map_df(1988:year,~{loadCamaraProposals(.x)})
+
 .votacoesPlenarioCamara <- loadVotacoesOrientacoesCamara(year = year);
+
 .votacoesPlenarioVotos <- loadVotacoesCamara(year = year);
 
-.data <- dplyr::left_join(.votacoesPlenarioVotos, .votacoesPlenarioCamara)
+.rollcallData <- dplyr::left_join(.votacoesPlenarioVotos, .votacoesPlenarioCamara)
+
+.data <- dplyr::left_join(.rollcallData, .proposalDetails) %>% 
+  dplyr::select(bill_id, rollcall_id, type_bill, number_bill, year_bill, decision_summary, decision_date, decision_time, rollcall_subject, rollcall_keywords, legislator_name, legislator_party, legislator_state, legislator_vote, sigla_orgao, sigla_bancada, orientation)
+
 
 if (ascii == TRUE) {
 .data <- .data %>% dplyr::mutate_if(is.character, function(x) stringi::stri_trans_general(x, "Latin-ASCII"))

@@ -22,7 +22,7 @@ NULL
 #'   \item rollcall_keywords \code{character}. Full names of Brazilian states.
 #' }
 #'
-#' @format A data frame with 567833 rows and 5 variables
+#' @format A data frame with 52049 rows and 5 variables
 "proposals"
 NULL
 

@@ -40,9 +40,11 @@ library(CamaraBR)
 ## Usage
 
 ```{r, eval=FALSE}
+# data1990 <- buildRollcallDataset(year = 1995)
+
 data2020 <- buildRollcallDataset(year = 2020)
 
-data1990 <- buildRollcallDataset(year = 1995)
+
 ```
 
 
@@ -66,6 +68,8 @@ proposals <- purrr::map_df(anos,
 
 # fwrite(proposals, file = "data/proposals.txt")
 
-save(proposals, file = "data/proposals.rda")
+# save(proposals, file = "data/proposals.rda")
 ```
+
+
 
