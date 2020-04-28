@@ -44,15 +44,25 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill",
     dplyr::select(bill_id, type_bill, year_bill, number_bill, rollcall_subject, rollcall_keywords)
   return(.proposals)
 }
+NULL
 
 
-#' Load orietation of deputie's roll-call votes 
+
+
+
+
+
+
+
+
+
+#' Load orietation of deputie's roll-call votes
 #'
 #'
 #' @param year An integer
 #'
-#' @examples 
-#' 
+#' @examples
+#'
 #' # dados2 <- loadVotacoesOrientacoesCamara(2020)
 #'
 #' @importFrom data.table fread
@@ -65,10 +75,11 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill",
 #' @importFrom dplyr filter
 #' @importFrom stringr str_replace
 #' @importFrom stringr str_extract
+#' @importFrom stringr str_replace_all
+#' @importFrom stringi stri_trans_general
 #' @rdname loadVotacoesOrientacoesCamara
 #' @export
-`loadVotacoesOrientacoesCamara` <- function(year){
-
+`loadVotacoesOrientacoesCamara` <- function(year) {
   if (is.null(year)) {
     stop("Lacking arguments. year is mandatory")
   }
@@ -76,34 +87,78 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill",
   if (year < 2003) {
     stop("Orientation information is only available from 2003 onwards")
   }
-
-  .file <- paste0("https://dadosabertos.camara.leg.br/arquivos/votacoesOrientacoes/csv/votacoesOrientacoes-", year, ".csv")
   
-message(paste0("\nDownloading rollcall orientation for proposals of ", year))
+  .file <-
+    paste0(
+      "https://dadosabertos.camara.leg.br/arquivos/votacoesOrientacoes/csv/votacoesOrientacoes-",
+      year,
+      ".csv"
+    )
   
-.votacoesOrientacoes <- data.table::fread(.file, colClasses = 'character', data.table = FALSE) %>% 
-   dplyr::mutate(bill_id = stringr::str_extract(idVotacao,".+?(?=-)")) %>%
-    dplyr::rename(rollcall_id = idVotacao,
-                 uri_votacao = uriVotacao, 
-                 orientation = orientacao,
-                decision_summary = descricao,
-                sigla_orgao = siglaOrgao,
-                sigla_bancada = siglaBancada) %>%
-  dplyr::select(bill_id, rollcall_id, decision_summary, sigla_orgao, sigla_bancada, orientation, uri_votacao)
-return(.votacoesOrientacoes)
-  }
+  message(paste0("\nDownloading rollcall orientation for proposals of ", year))
+  
+  .votacoesOrientacoes <-
+    data.table::fread(.file, colClasses = 'character', data.table = FALSE) %>%
+    dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaBancada, "Latin-ASCII")) %>% dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^MINORIA$", "Minoria"))  %>%
+    dplyr::mutate(sigla_bancada =  stringr::str_replace_all(sigla_bancada, "^MAIORIA$", "Maioria"))  %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^AVANTE$", "Avante"))  %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada,  "^CIDADANIA$", "Cidadania")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODEMOS$", "Podemos")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODE$", "Podemos")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^REDE$", "Rede")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PC do B$|^PC DO B$", "PCdoB")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PCDOB$|^PCDoB$", "PCdoB")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV.$", "GOV")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV$", "GOV")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Oposicao$", "Oposicao")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^NOVO$", "Novo")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRIOTA$", "Patriota")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRI$", "Patriota")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^NOVO$", "Novo")) %>%
+    dplyr::mutate(
+      sigla_bancada = stringr::str_replace_all(sigla_bancada, "^SOLIDARIEDADE$", "Solidaried")
+    ) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^SDD$", "Solidaried")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^REPUBLICANO$", "Republican")) %>%
+    dplyr::mutate(bill_id = stringr::str_extract(idVotacao, ".+?(?=-)")) %>%
+    dplyr::rename(
+      rollcall_id = idVotacao,
+      uri_votacao = uriVotacao,
+      orientation = orientacao,
+      decision_summary = descricao,
+      sigla_orgao = siglaOrgao
+    ) %>%
+    dplyr::select(
+      bill_id,
+      rollcall_id,
+      decision_summary,
+      sigla_orgao,
+      sigla_bancada,
+      orientation,
+      uri_votacao
+    )
+  return(.votacoesOrientacoes)
+}
 NULL
 
 
 
 
-#' Load deputie's roll-call votes 
+
+
+
+
+
+
+
+
+#' Load deputie's roll-call votes
 #'
 #' @param year An integer
-#' 
-#' @examples 
+#'
+#' @examples
 #' # dados3 <- loadVotacoesCamara(2020)
-#' 
+#'
 #' @importFrom data.table fread
 #' @importFrom tibble tibble
 #' @importFrom purrr map_df
@@ -115,11 +170,11 @@ NULL
 #' @importFrom dplyr filter
 #' @importFrom stringr str_replace
 #' @importFrom stringr str_extract
-#' 
+#' @importFrom stringr str_replace_all
+#'
 #' @rdname loadVotacoesCamara
 #' @export
 `loadVotacoesCamara` <- function(year) {
-
   if (is.null(year)) {
     stop("Lacking arguments. year is mandatory")
   }
@@ -134,20 +189,42 @@ NULL
       year,
       ".csv"
     )
-
+  
   message(paste0("\nDownloading rollcall votes for proposals of ", year))
   
-.votacoesVotos <- data.table::fread(.file, colClasses = 'character', data.table = FALSE) %>%
-dplyr::mutate(decision_date = as.Date(stringr::str_replace(dataHoraVoto, 'T+', ' '))) %>%
-dplyr::mutate(decision_time = stringr::str_extract(dataHoraVoto, '(?<=T).+')) %>%
-  dplyr::mutate(bill_id = stringr::str_extract(idVotacao,".+?(?=-)")) %>%
-    dplyr::rename(rollcall_id = idVotacao,
-                  legislator_id = deputado_id,
-                  legislator_name = deputado_nome,
-                  legislator_party = deputado_siglaPartido, 
-                  legislator_state = deputado_siglaUf,
-                  legislator_vote = voto) %>% 
-  dplyr::select(bill_id, rollcall_id, decision_date, decision_time, legislator_vote, legislator_id, legislator_name, legislator_party, legislator_state)
-return(.votacoesVotos)
+  .votacoesVotos <-
+    data.table::fread(.file, colClasses = 'character', data.table = FALSE) %>%
+    dplyr::mutate(decision_date = as.Date(stringr::str_replace(dataHoraVoto, 'T+', ' '))) %>%
+    dplyr::mutate(decision_time = stringr::str_extract(dataHoraVoto, '(?<=T).+')) %>%
+    dplyr::mutate(bill_id = stringr::str_extract(idVotacao, ".+?(?=-)")) %>%
+    dplyr::mutate(
+      deputado_siglaPartido = stringr::str_replace_all(deputado_siglaPartido, "^PATRIOTA$", "PATRI")
+    ) %>%
+    dplyr::mutate(
+      deputado_siglaPartido = stringr::str_replace_all(deputado_siglaPartido, "^SD$", "SOLIDARIEDADE")
+    ) %>%
+    dplyr::mutate(
+      deputado_siglaPartido = stringr::str_replace_all(deputado_siglaPartido, "^SDD$", "SOLIDARIEDADE")
+    ) %>%
+    dplyr::rename(
+      rollcall_id = idVotacao,
+      legislator_id = deputado_id,
+      legislator_name = deputado_nome,
+      legislator_party = deputado_siglaPartido,
+      legislator_state = deputado_siglaUf,
+      legislator_vote = voto
+    ) %>%
+    dplyr::select(
+      bill_id,
+      rollcall_id,
+      decision_date,
+      decision_time,
+      legislator_vote,
+      legislator_id,
+      legislator_name,
+      legislator_party,
+      legislator_state
+    )
+  return(.votacoesVotos)
 }
 NULL

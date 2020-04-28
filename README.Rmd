@@ -62,6 +62,7 @@ base %>%
 ```
 
 
+## Downloading proposal details 
 ```{r, eval=FALSE}
 require(purrr)
 require(progress);
@@ -72,9 +73,7 @@ barra <- progress_bar$new(total = length(anos),
                           format = "[:bar] :percent eta: :eta")
       
 
-
-proposals <- purrr::map_df(anos, 
-                         ~{
+proposals <- purrr::map_df(anos, ~{
                            barra$tick()
                            loadCamaraProposals(.x)
                            })
@@ -85,6 +84,48 @@ proposals %>% count(type_bill)
 # fwrite(proposals, file = "data/proposals.txt")
 
 # save(proposals, file = "data/proposals.rda")
+```
+
+
+
+## Downloading legislator rollcall vote details 
+```{r, eval=FALSE}
+require(purrr)
+require(progress);
+
+anos = 2003:2020
+
+barra <- progress_bar$new(total = length(anos), 
+                          format = "[:bar] :percent eta: :eta")
+
+ rollcall <- purrr::map_df(anos, ~{
+                           barra$tick()
+                           loadVotacoesCamara(.x)
+                          })
+
+
+rollcall %>% count(legislator_party)
+```
+
+
+
+## Downloading rollcall vote orientations
+
+```{r, eval=FALSE}
+require(purrr)
+
+anos = 2003:2020
+
+orientation <- purrr::map_df(anos, ~{
+                           loadVotacoesOrientacoesCamara(.x)
+                           })
+
+
+
+orientation %>% count(sigla_orgao)
+
+
+orientation %>% count(sigla_bancada)
 ```
 
 
