@@ -33,12 +33,39 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
 }
 ## install dev version of CamaraBR from github
 devtools::install_github("danielmarcelino/CamaraBR")
-## load SenadoBR package
+## load CamaraBR package
 library(CamaraBR)
 ```
 
 ## Usage
 
 ```{r, eval=FALSE}
+data2020 <- buildRollcallDataset(year = 2020)
 
+data1990 <- buildRollcallDataset(year = 1995)
 ```
+
+
+```{r, eval=FALSE}
+require(purrr)
+require(progress);
+
+anos = 1988:2020
+
+barra <- progress_bar$new(total = length(anos), 
+                          format = "[:bar] :percent eta: :eta")
+      
+
+
+proposals <- purrr::map_df(anos, 
+                         ~{
+                           barra$tick()
+                           loadCamaraProposals(.x)
+                           })
+
+
+# fwrite(proposals, file = "data/proposals.txt")
+
+save(proposals, file = "data/proposals.rda")
+```
+

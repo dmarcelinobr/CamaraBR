@@ -1,0 +1,40 @@
+Package: CamaraBR
+Type: Package
+Title: Download, Unpack and Tidy Legislative Data from the Brazilian Chamber of Deputies
+Version: 0.0.2
+Authors@R: c(
+    person(given = "Daniel", family = "Marcelino", email = "dmarcelino@live.com", role = c("aut", "cre"))
+    )
+Description: Downloads and tidies data from the Brazilian
+    Chamber of Deputies Application Programming Interfaces available at <http://dadosabertos.camara.leg.br/>.
+Tags: idealpoints legismetrics legislative
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends: 
+    R (>= 4.0)
+Imports: 
+    rlang (>= 0.4.5),
+    data.table (>= 1.12.8),
+    ggplot2 (>= 3.0.0),
+    dplyr (>= 0.7.0),
+    purrr (>= 0.2.2),
+    jsonlite (>= 1.6.1),
+    xml2 (>= 1.0.0),
+    httr(>= 1.2.1),
+    lubridate (>= 1.6.0),
+    magrittr (>= 1.5),
+    stringi (>= 1.1.2),
+    tidyr (>= 0.6.0),
+    stringr (>= 1.1.0),
+    tibble (>= 1.2),
+    pscl (>= 1.4.9),
+    glue (>= 0.0.1),
+    progress (>= 0.0.1)
+RoxygenNote: 7.1.0
+Suggests: 
+    devtools,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+
