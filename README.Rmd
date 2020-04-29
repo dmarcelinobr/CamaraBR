@@ -39,30 +39,7 @@ library(CamaraBR)
 
 ## Usage
 
-```{r, eval=FALSE}
-# data1990 <- buildRollcallDataset(year = 1995)
-
-data2020 <- buildRollcallDataset(year = 2020)
-
-
-
-
-siglaTipo = c("MPV", "MSC", "PDC", "PDL", "PEC", "PL", "PLS", "PLN", "PLP", "REC", "REQ")
-
-
-# Limpando a base
-base <- transformVotes(data2020, filter = TRUE)
-
-# Votações válidas no ano para o nosso cálculo
-base %>%
-  # filter(!is.na(GOV_orientation)) %>%
-  distinct(rollcall_id) %>%
-  nrow()
-
-```
-
-
-## Downloading proposal details 
+### Downloading proposal details 
 ```{r, eval=FALSE}
 require(purrr)
 require(progress);
@@ -88,7 +65,7 @@ proposals %>% count(type_bill)
 
 
 
-## Downloading legislator rollcall vote details 
+### Downloading legislator rollcall vote details 
 ```{r, eval=FALSE}
 require(purrr)
 require(progress);
@@ -108,8 +85,7 @@ rollcall %>% count(legislator_party)
 ```
 
 
-
-## Downloading rollcall vote orientations
+### Downloading rollcall vote orientations
 
 ```{r, eval=FALSE}
 require(purrr)
@@ -121,12 +97,88 @@ orientation <- purrr::map_df(anos, ~{
                            })
 
 
-
 orientation %>% count(sigla_orgao)
 
 
 orientation %>% count(sigla_bancada)
 ```
+
+
+### Build a rollcall dataset
+
+```{r, eval=FALSE}
+# data1990 <- buildRollcallDataset(year = 1995)
+
+data2020 <- buildRollcallDataset(year = 2020)
+
+```
+
+
+### Transform the dataset for analysis
+
+```{r, eval=FALSE}
+siglaTipo = c("MPV", "MSC", "PDC", "PDL", "PEC", "PL", "PLS", "PLN", "PLP", "REC", "REQ")
+
+
+# Limpando a base
+base <- transformVotes(data2020, filter = TRUE)
+
+
+# Votações válidas no ano para o nosso cálculo
+base %>%
+  # filter(!is.na(GOV_orientation)) %>%
+  distinct(rollcall_id) %>%
+  nrow()
+
+
+
+base %>%
+  filter(legislator_vote %in% c("Nao", "Obstrucao","Sim")) %>%
+  filter(!is.na(legislator_vote)) %>%
+  count(GOV_orientation)
+
+```
+
+
+## Governismo geral
+```{r}
+# base %>% group_by(legislator_party) %>% summarise(n=n()) %>% data.frame()
+
+## Governismo geral
+(governismo_geral <- base %>%
+  group_by(rollcall_id) %>%
+  summarise(governismo = mean(governismo, na.rm=T)) %>%
+  summarise(governismo = mean(governismo, na.rm=T)))
+```
+
+
+
+## Governismo por partido
+
+```{r}
+# Por partido
+governismo_partido <- base %>%
+  group_by(rollcall_id, legislator_party) %>%
+  summarise(soma = sum(governismo, na.rm=TRUE),
+            nao = sum(abs(-1 + governismo)),
+            governismo = mean(governismo, na.rm=TRUE),
+            freq = n()) %>%
+# filter(legislator_party %in% c("PT", "PSDB", "PMDB","MDB", "PSL", "PP","PR","PSD", "DEM")) %>%
+  group_by(legislator_party) %>%
+  summarise(governismo = mean(governismo, na.rm=TRUE),
+            soma = sum(soma, na.rm=TRUE),
+            nao = sum(nao))
+
+# governismo_partido %>% arrange(governismo) %>% data.frame()
+
+
+governismo_partido %>%
+  arrange(governismo) %>%
+  summarize(mu = mean(governismo, na.rm=T),
+            sd = sd(governismo, na.rm=T))
+```
+
+
 
 
 

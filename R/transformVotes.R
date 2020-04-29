@@ -1,3 +1,4 @@
+if (getRversion() >= "2.15.1")  utils::globalVariables(c(".data", ".cols"))
 #' Transform the database of rollcall votes
 #' 
 #' Transform a database of rollcall votes, use only after downloading data with `buildRollcallDataset`
@@ -12,11 +13,11 @@
 #'
 #' @export
 transformVotes <- function(.data, filter = TRUE) {
-  .data <- .data %>%
+ .data <- .data %>%
 dplyr::mutate(GOV_orientation = stringi::stri_trans_general(GOV_orientation, "Latin-ASCII")) %>% 
 dplyr::mutate(legislator_vote = stringi::stri_trans_general(legislator_vote, "Latin-ASCII"))
 
-  .data <- .data %>%
+.data <- .data %>%
      dplyr::mutate(GOV_orientation = ifelse(stringr::str_detect(GOV_orientation, "Sim"), 1, 
                                         ifelse(stringr::str_detect(GOV_orientation, "Nao"), 0, 
                                                ifelse(stringr::str_detect(GOV_orientation, "Liberado"), NA, GOV_orientation)))) 
