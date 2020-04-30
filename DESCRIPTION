@@ -28,7 +28,7 @@ Imports:
     tidyr (>= 1.0.2),
     stringr (>= 1.4.0),
     tibble (>= 3.0.1),
-    pscl (>= 1.4.9),
+    pscl (>= 1.5.5),
     glue (>= 1.4.0)
 RoxygenNote: 7.1.0
 Suggests: 
