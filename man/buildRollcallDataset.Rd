@@ -9,7 +9,7 @@ buildRollcallDataset(
   type = "",
   download = TRUE,
   ascii = FALSE,
-  outfile = "cham_data_votes/data_"
+  filter = TRUE
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ buildRollcallDataset(
 
 \item{ascii}{a logical}
 
-\item{outfile}{folder and name for the file}
+\item{filter}{a logical, if TRUE, it will filter data to a few types of bills, such as PEC, PL, PLP, PDL, PDC, MPV etc}
 }
 \description{
 Fetch bills discussed and voted on the plenary

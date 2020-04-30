@@ -1,4 +1,4 @@
-if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "decision_time", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao", "GOV_orientation", "Oposicao_orientation", "Minoria_orientation", "Maioria_orientation"))
+if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "decision_time", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao", "ori_GOV", "ori_Oposicao", "ori_Minoria", "ori_Maioria"))
 
 #' Load deputie's roll-call votes 
 #'
@@ -38,9 +38,8 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill",
                   type_bill = siglaTipo, 
                   year_bill = ano,
                   number_bill = numero,
-                  rollcall_keywords = keywords,
                   rollcall_subject = ementa) %>% 
-    dplyr::select(bill_id, type_bill, year_bill, number_bill, rollcall_subject, rollcall_keywords)
+    dplyr::select(bill_id, type_bill, year_bill, number_bill, rollcall_subject)
   return(.proposals)
 }
 NULL
@@ -99,7 +98,7 @@ NULL
   
   .votacoesOrientacoes <-
     data.table::fread(.file, colClasses = 'character', data.table = FALSE) %>%
-    dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaBancada, "Latin-ASCII")) %>%
+    dplyr::mutate(orientacao = stringi::stri_trans_general(orientacao, "Latin-ASCII")) %>%   dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaBancada, "Latin-ASCII")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^MINORIA$", "Minoria"))  %>%
     dplyr::mutate(sigla_bancada =  stringr::str_replace_all(sigla_bancada, "^MAIORIA$", "Maioria"))  %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^AVANTE$", "Avante"))  %>%
@@ -109,9 +108,8 @@ NULL
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^REDE$", "Rede")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PC do B$|^PC DO B$", "PCdoB")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PCDOB$|^PCDoB$", "PCdoB")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Gov", "GOV")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV.$", "GOV")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV$", "GOV")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Oposicao$", "Oposicao")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^NOVO$", "Novo")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRIOTA$", "Patriota")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRI$", "Patriota")) %>%
@@ -138,13 +136,10 @@ NULL
       orientation
       )
   
-  .cols <-.votacoesOrientacoes %>% pull(sigla_bancada) %>% unique %>% na.omit %>% as.vector()
-  .data <- .votacoesOrientacoes %>% 
-    tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation) %>%
-    dplyr::select(-bill_id, -decision_summary, -sigla_orgao)
+  .data <- .votacoesOrientacoes %>%
+    tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation, names_prefix = 'ori_') %>% left_join(.votacoesOrientacoes %>% select(-bill_id, -sigla_orgao, -decision_summary), by = 'rollcall_id')
   
-  .votacoesOrientacoes <- left_join(.votacoesOrientacoes, .data, by =  'rollcall_id') %>% rename_at(vars(.cols), ~paste0(., '_orientation'))
-  return(.votacoesOrientacoes)
+  return(.data)
 }
 NULL
 
@@ -202,6 +197,7 @@ NULL
     dplyr::mutate(decision_date = as.Date(stringr::str_replace(dataHoraVoto, 'T+', ' '))) %>%
     dplyr::mutate(decision_time = stringr::str_extract(dataHoraVoto, '(?<=T).+')) %>%
     dplyr::mutate(bill_id = stringr::str_extract(idVotacao, ".+?(?=-)")) %>%
+    dplyr::mutate(voto = stringi::stri_trans_general(voto, "Latin-ASCII")) %>%  
     dplyr::mutate(
       deputado_siglaPartido = stringr::str_replace_all(deputado_siglaPartido, "^PATRIOTA$", "PATRI")
     ) %>%

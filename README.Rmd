@@ -41,8 +41,9 @@ library(CamaraBR)
 
 ### Downloading proposal details 
 ```{r, eval=FALSE}
-require(purrr)
-require(progress);
+library(tidyverse)
+library(CamaraBR)
+library(progress);
 
 anos = 1988:2020
 
@@ -67,8 +68,6 @@ proposals %>% count(type_bill)
 
 ### Downloading legislator rollcall vote details 
 ```{r, eval=FALSE}
-require(purrr)
-require(progress);
 
 anos = 2003:2020
 
@@ -88,7 +87,6 @@ rollcall %>% count(legislator_party)
 ### Downloading rollcall vote orientations
 
 ```{r, eval=FALSE}
-require(purrr)
 
 anos = 2003:2020
 
@@ -107,9 +105,23 @@ orientation %>% count(sigla_bancada)
 ### Build a rollcall dataset
 
 ```{r, eval=FALSE}
-# data1990 <- buildRollcallDataset(year = 1995)
+# data <- buildRollcallDataset(year = 1999)
 
-data2020 <- buildRollcallDataset(year = 2020)
+data <- buildRollcallDataset(year = 2019)
+
+
+# Votações válidas no ano para o nosso cálculo
+data %>%
+  # filter(!is.na(GOV_orientation)) %>%
+  distinct(rollcall_id) %>%
+  nrow()
+
+
+
+data %>%
+  filter(legislator_vote %in% c("Não", "Obstrução","Sim")) %>%
+  filter(!is.na(legislator_vote)) %>%
+  count(ori_GOV)
 
 ```
 
@@ -117,45 +129,32 @@ data2020 <- buildRollcallDataset(year = 2020)
 ### Transform the dataset for analysis
 
 ```{r, eval=FALSE}
-siglaTipo = c("MPV", "MSC", "PDC", "PDL", "PEC", "PL", "PLS", "PLN", "PLP", "REC", "REQ")
+siglaTipo = c("PEC", "PL", "PLP")
 
 
 # Limpando a base
-base <- transformVotes(data2020, filter = TRUE)
-
-
-# Votações válidas no ano para o nosso cálculo
-base %>%
-  # filter(!is.na(GOV_orientation)) %>%
-  distinct(rollcall_id) %>%
-  nrow()
-
-
-
-base %>%
-  filter(legislator_vote %in% c("Nao", "Obstrucao","Sim")) %>%
-  filter(!is.na(legislator_vote)) %>%
-  count(GOV_orientation)
+base <- transformVotes(data, filter = TRUE)
 
 ```
 
 
 ## Governismo geral
-```{r}
+```{r, eval=FALSE}
 # base %>% group_by(legislator_party) %>% summarise(n=n()) %>% data.frame()
 
 ## Governismo geral
-(governismo_geral <- base %>%
+base %>%
   group_by(rollcall_id) %>%
   summarise(governismo = mean(governismo, na.rm=T)) %>%
-  summarise(governismo = mean(governismo, na.rm=T)))
+  summarise(governismo = mean(governismo, na.rm=T))
+
 ```
 
 
 
 ## Governismo por partido
 
-```{r}
+```{r, eval=FALSE}
 # Por partido
 governismo_partido <- base %>%
   group_by(rollcall_id, legislator_party) %>%
@@ -169,15 +168,14 @@ governismo_partido <- base %>%
             soma = sum(soma, na.rm=TRUE),
             nao = sum(nao))
 
-# governismo_partido %>% arrange(governismo) %>% data.frame()
+governismo_partido %>% arrange(governismo) %>% data.frame()
 
 
+# Média de governismo entre os partidos
 governismo_partido %>%
-  arrange(governismo) %>%
   summarize(mu = mean(governismo, na.rm=T),
             sd = sd(governismo, na.rm=T))
 ```
-
 
 
 

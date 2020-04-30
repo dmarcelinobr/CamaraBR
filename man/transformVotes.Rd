@@ -9,7 +9,7 @@ transformVotes(.data, filter = TRUE)
 \arguments{
 \item{.data}{the data frame}
 
-\item{filter}{a logical, if TRUE}
+\item{filter}{a logical, if TRUE, only rollcall votes with strictly government orientation and legislator vote cast will be returned. So "liberado" cases are filtered from data.}
 }
 \description{
 Transform a database of rollcall votes, use only after downloading data with `buildRollcallDataset`
