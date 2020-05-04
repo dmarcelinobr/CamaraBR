@@ -105,6 +105,7 @@ orientation %>% count(sigla_bancada)
 ### Build a rollcall dataset
 
 ```{r, eval=FALSE}
+# legacy: data <- data %>% filter(type_bill == "MPV", number_bill == 897, year_bill == 2019 )
 # data <- buildRollcallDataset(year = 1999)
 
 data <- buildRollcallDataset(year = 2019)
@@ -112,14 +113,14 @@ data <- buildRollcallDataset(year = 2019)
 
 # Votações válidas no ano para o nosso cálculo
 data %>%
-  # filter(!is.na(GOV_orientation)) %>%
+  # filter(!is.na(ori_GOV)) %>%
   distinct(rollcall_id) %>%
   nrow()
 
 
 
 data %>%
-  filter(legislator_vote %in% c("Não", "Obstrução","Sim")) %>%
+  filter(legislator_vote %in% c("Nao", "Obstrução","Sim")) %>%
   filter(!is.na(legislator_vote)) %>%
   count(ori_GOV)
 
@@ -133,7 +134,15 @@ siglaTipo = c("PEC", "PL", "PLP")
 
 
 # Limpando a base
-base <- transformVotes(data, filter = TRUE)
+base <- transformVotes(data, filter = FALSE)
+
+base2 <- transformVotes(data, filter = TRUE) # only considers rollcall with gov orientation
+
+
+base %>%
+  # filter(!is.na(ori_GOV)) %>%
+  distinct(rollcall_id) %>%
+  nrow()
 
 ```
 

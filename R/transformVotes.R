@@ -4,7 +4,7 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c(".data", ".cols"))
 #' Transform a database of rollcall votes, use only after downloading data with `buildRollcallDataset`
 #'
 #' @param .data the data frame
-#' @param filter a logical, if TRUE, only rollcall votes with strictly government orientation and legislator vote cast will be returned. So "liberado" cases are filtered from data.
+#' @param filter a logical, if TRUE, only rollcall votes with government orientation is returned. So "liberado" or missing cases are filtered from data output.
 #' 
 #' @importFrom dplyr mutate
 #' @importFrom dplyr filter
@@ -12,7 +12,7 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c(".data", ".cols"))
 #' @importFrom stringi stri_trans_general
 #'
 #' @export
-transformVotes <- function(.data,  filter = TRUE) {
+transformVotes <- function(.data,  filter = FALSE) {
   
   if (is.null(.data)) {
     stop("Need a data frame to perform vote transformation")

@@ -1,4 +1,4 @@
-if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "decision_time", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao", "ori_GOV", "ori_Oposicao", "ori_Minoria", "ori_Maioria"))
+if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "decision_time", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao", "ori_GOV", "ori_Oposicao", "ori_Minoria", "ori_Maioria", "proposicao_ano", "proposicao_ementa", "proposicao_siglaTipo", "proposicao_titulo", "proposicao_id", "proposicao_numero", "bill_name"))
 
 #' Load deputie's roll-call votes 
 #'
@@ -29,17 +29,19 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill",
     stop("Lacking arguments. year is mandatory")
   }
   
-  .file <- paste0("https://dadosabertos.camara.leg.br/arquivos/proposicoes/csv/proposicoes-", year, ".csv")
+  .file <- paste0("https://dadosabertos.camara.leg.br/arquivos/votacoesProposicoes/csv/votacoesProposicoes-", year, ".csv")
   
   message(paste0("\nDownloading detailed information for proposals from: ", year))
   
   .proposals <- data.table::fread(.file, colClasses = 'character', data.table = FALSE) %>%
-    dplyr::rename(bill_id = id,
-                  type_bill = siglaTipo, 
-                  year_bill = ano,
-                  number_bill = numero,
-                  rollcall_subject = ementa) %>% 
-    dplyr::select(bill_id, type_bill, year_bill, number_bill, rollcall_subject)
+    dplyr::rename(rollcall_id = idVotacao,
+                  bill_id = proposicao_id,
+                  bill_name = proposicao_titulo,
+                  type_bill = proposicao_siglaTipo, 
+                  year_bill = proposicao_ano,
+                  number_bill = proposicao_numero,
+                  rollcall_subject = proposicao_ementa) %>% 
+    dplyr::select(rollcall_id, bill_id, bill_name, type_bill, year_bill, number_bill, rollcall_subject)
   return(.proposals)
 }
 NULL
@@ -142,8 +144,6 @@ NULL
   return(.data)
 }
 NULL
-
-
 
 
 

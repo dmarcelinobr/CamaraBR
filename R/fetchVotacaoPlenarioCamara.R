@@ -45,7 +45,8 @@ buildRollcallDataset <- function (year = 2020, type = "", download = TRUE, ascii
   }
 
   if (download == TRUE) {
-    .proposalDetails <- purrr::map_df(1988:year,~{loadCamaraProposals(.x)})
+    .proposalDetails <- loadCamaraProposals(year)
+    # .proposalDetails <- purrr::map_df(1988:year,~{loadCamaraProposals(.x)})
   }
 
 .votacoesPlenarioCamara <- loadVotacoesOrientacoesCamara(year);
@@ -56,13 +57,13 @@ buildRollcallDataset <- function (year = 2020, type = "", download = TRUE, ascii
   dplyr::distinct(rollcall_id, legislator_id, .keep_all = TRUE)
 
 .data <- dplyr::left_join(.votacoesPlenarioVotos, .proposalDetails) %>% 
-  dplyr::mutate(sigla_orgao = ifelse(is.na(sigla_orgao) & legislator_vote != "Simbolico", "PLEN", sigla_orgao)) %>% 
-  dplyr::mutate(legislator_vote = ifelse(legislator_vote == "", NA, legislator_vote)) %>% 
-  dplyr::select(bill_id, rollcall_id, type_bill, number_bill, year_bill, decision_summary, decision_date, decision_time, rollcall_subject, legislator_id, legislator_name, legislator_party, legislator_state, legislator_vote, sigla_orgao, orientation, ori_GOV, everything()) 
+# dplyr::mutate(sigla_orgao = ifelse(is.na(sigla_orgao) & legislator_vote != "Simbolico", "PLEN", sigla_orgao)) %>% 
+dplyr::mutate(legislator_vote = ifelse(legislator_vote == "", NA, legislator_vote)) %>%
+dplyr::select(bill_name, bill_id, rollcall_id, type_bill, number_bill, year_bill, decision_summary, decision_date, decision_time, rollcall_subject, legislator_id, legislator_name, legislator_party, legislator_state, legislator_vote, sigla_orgao, orientation, ori_GOV, everything()) 
 
 if (filter == TRUE) {
-  .data <- dplyr::filter(.data, sigla_orgao == "PLEN")
-# type_bill %in% c("PL", "PEC", "PLP", "MPV", "REQ", "REC", "PRC", "PDC", "PDL", "PLN", "PFC", "PLV", "PLC")
+.data <- dplyr::filter(.data, type_bill %in% c("PL", "PEC", "PLP", "MPV", "REQ", "REC", "PRC", "PDC", "PDL", "PLN", "PFC", "PLV", "PLC"))
+#  sigla_orgao == "PLEN" 
 }
 
 
