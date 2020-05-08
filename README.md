@@ -76,7 +76,7 @@ rollcall %>% count(legislator_party)
 
 ``` r
 
-anos = 2003:2020
+anos = 2019:2020
 
 orientation <- purrr::map_df(anos, ~{
                            loadVotacoesOrientacoesCamara(.x)
@@ -92,21 +92,22 @@ orientation %>% count(sigla_bancada)
 ### Build a rollcall dataset
 
 ``` r
-# data1990 <- buildRollcallDataset(year = 1995)
+# legacy: data <- data %>% filter(type_bill == "MPV", number_bill == 897, year_bill == 2019 )
+# data <- buildRollcallDataset(year = 1999)
 
 data <- buildRollcallDataset(year = 2019)
 
 
 # Votações válidas no ano para o nosso cálculo
 data %>%
-  # filter(!is.na(GOV_orientation)) %>%
+  # filter(!is.na(ori_GOV)) %>%
   distinct(rollcall_id) %>%
   nrow()
 
 
 
 data %>%
-  filter(legislator_vote %in% c("Não", "Obstrução","Sim")) %>%
+  filter(legislator_vote %in% c("Nao", "Obstrução","Sim")) %>%
   filter(!is.na(legislator_vote)) %>%
   count(ori_GOV)
 ```
@@ -118,7 +119,15 @@ siglaTipo = c("PEC", "PL", "PLP")
 
 
 # Limpando a base
-base <- transformVotes(data, filter = TRUE)
+base <- transformVotes(data, filter = FALSE)
+
+base2 <- transformVotes(data, filter = TRUE) # only considers rollcall with gov orientation
+
+
+base %>%
+  # filter(!is.na(ori_GOV)) %>%
+  distinct(rollcall_id) %>%
+  nrow()
 ```
 
 ## Governismo geral
@@ -127,10 +136,10 @@ base <- transformVotes(data, filter = TRUE)
 # base %>% group_by(legislator_party) %>% summarise(n=n()) %>% data.frame()
 
 ## Governismo geral
-(governismo_geral <- base %>%
+base %>%
   group_by(rollcall_id) %>%
   summarise(governismo = mean(governismo, na.rm=T)) %>%
-  summarise(governismo = mean(governismo, na.rm=T)))
+  summarise(governismo = mean(governismo, na.rm=T))
 ```
 
 ## Governismo por partido
@@ -152,8 +161,30 @@ governismo_partido <- base %>%
 governismo_partido %>% arrange(governismo) %>% data.frame()
 
 
+# Média de governismo entre os partidos
 governismo_partido %>%
-  arrange(governismo) %>%
   summarize(mu = mean(governismo, na.rm=T),
             sd = sd(governismo, na.rm=T))
 ```
+
+## Quer apresentar seus dados e não sabe como?
+
+``` r
+
+library(SciencesPo)
+library(ggdecor)
+
+
+camara <- data.frame(
+         parties = c("PSL", "PT", "MDB", "PTB", "PP", "PSB", "DEM", "PSDB", "Outros"), 
+         seats   = c(80, 61, 60, 35, 46, 28, 67, 50, 86),
+         stringsAsFactors = FALSE)
+
+ ggplot(camara) +
+   geom_chamber(aes(seats = seats, fill = parties), color = "black") +
+   scale_fill_classic() +
+   coord_fixed() +
+   theme_void()
+```
+
+![Plot](inst/figures/chamber.png)

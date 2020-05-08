@@ -1,5 +1,10 @@
 if (getRversion() >= "2.15.1")  utils::globalVariables(".")
 
+"%||%" <- function(a, b) {
+  if (!is.null(a)) a else b
+}
+
+
 # Emulate '+' python function for piping string joins
 `%p%` <- function(e1, e2) return(paste0(e1, e2))
 

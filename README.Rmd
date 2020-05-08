@@ -88,7 +88,7 @@ rollcall %>% count(legislator_party)
 
 ```{r, eval=FALSE}
 
-anos = 2003:2020
+anos = 2019:2020
 
 orientation <- purrr::map_df(anos, ~{
                            loadVotacoesOrientacoesCamara(.x)
@@ -188,4 +188,26 @@ governismo_partido %>%
 
 
 
+## Quer apresentar seus dados e não sabe como?
+
+```{r, eval=FALSE}
+
+library(SciencesPo)
+library(ggdecor)
+
+
+camara <- data.frame(
+         parties = c("PSL", "PT", "MDB", "PTB", "PP", "PSB", "DEM", "PSDB", "Outros"), 
+         seats   = c(80, 61, 60, 35, 46, 28, 67, 50, 86),
+         stringsAsFactors = FALSE)
+
+ ggplot(camara) +
+   geom_chamber(aes(seats = seats, fill = parties), color = "black") +
+   scale_fill_classic() +
+   coord_fixed() +
+   theme_void()
+
+```
+
+![Plot](inst/figures/chamber.png)
 
