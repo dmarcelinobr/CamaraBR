@@ -27,6 +27,6 @@ buildRollcallDataset(
 Fetch bills discussed and voted on the plenary
 }
 \examples{
-# data <- buildRollcallDataset(year=2020)
+data <- buildRollcallDataset(year=2020)
 
 }

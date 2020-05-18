@@ -68,6 +68,8 @@ proposals %>% count(type_bill)
 
 ### Downloading legislator rollcall vote details 
 ```{r, eval=FALSE}
+library(CamaraBR)
+library(progress)
 
 anos = 2003:2020
 
@@ -87,6 +89,7 @@ rollcall %>% count(legislator_party)
 ### Downloading rollcall vote orientations
 
 ```{r, eval=FALSE}
+library(CamaraBR)
 
 anos = 2019:2020
 
@@ -107,6 +110,7 @@ orientation %>% count(sigla_bancada)
 ```{r, eval=FALSE}
 # legacy: data <- data %>% filter(type_bill == "MPV", number_bill == 897, year_bill == 2019 )
 # data <- buildRollcallDataset(year = 1999)
+library(CamaraBR)
 
 data <- buildRollcallDataset(year = 2019)
 

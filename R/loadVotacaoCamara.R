@@ -1,4 +1,4 @@
-if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "decision_time", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao", "ori_GOV", "ori_Oposicao", "ori_Minoria", "ori_Maioria", "proposicao_ano", "proposicao_ementa", "proposicao_siglaTipo", "proposicao_titulo", "proposicao_id", "proposicao_numero", "bill_name"))
+if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "decision_time", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao", "ori_Governo", "ori_GOV", "ori_Oposicao", "ori_Minoria", "ori_Maioria", "proposicao_ano", "proposicao_ementa", "proposicao_siglaTipo", "proposicao_titulo", "proposicao_id", "proposicao_numero", "bill_name", "dataRegistroVoto", "codPartidoBloco", "codPartido", "siglaPartidoBloco", "orientacaoVoto", "tipoVoto"))
 
 #' Load deputie's roll-call votes 
 #'
@@ -73,6 +73,7 @@ NULL
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
+#' @importFrom tidyr pivot_wider
 #' @importFrom stringr str_replace
 #' @importFrom stringr str_extract
 #' @importFrom stringr str_replace_all
@@ -97,7 +98,7 @@ NULL
     )
   
   message(paste0("\nDownloading rollcall orientation for proposals of ", year))
-  
+
   .votacoesOrientacoes <-
     data.table::fread(.file, colClasses = 'character', data.table = FALSE) %>%
     dplyr::mutate(orientacao = stringi::stri_trans_general(orientacao, "Latin-ASCII")) %>%   dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaBancada, "Latin-ASCII")) %>%
@@ -110,8 +111,7 @@ NULL
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^REDE$", "Rede")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PC do B$|^PC DO B$", "PCdoB")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PCDOB$|^PCDoB$", "PCdoB")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Gov", "GOV")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV.$", "GOV")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV.$", "Governo")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^NOVO$", "Novo")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRIOTA$", "Patriota")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRI$", "Patriota")) %>%
@@ -229,3 +229,111 @@ NULL
   return(.votacoesVotos)
 }
 NULL
+
+
+
+#' Fetch roll-call party/bloc vote orientation 
+#' 
+#' @param id A string for the roll-call id
+#'
+#'
+#' @examples 
+#'
+#'  dat <- fetchVotacoesOrientacoesCamara("2206395-58")
+#'  
+#' @importFrom tibble tibble
+#' @importFrom magrittr "%>%"
+#' @importFrom dplyr mutate
+#' @importFrom dplyr select
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate_if
+#' @importFrom dplyr rename
+#' @importFrom stringr str_replace
+#' @importFrom stringr str_extract
+#' @importFrom stringr str_replace_all
+#' @importFrom stringi stri_trans_general
+#' @importFrom stats na.omit
+#' @importFrom tidyr pivot_wider
+#' @rdname fetchVotacoesOrientacoesCamara
+#' @export 
+fetchVotacoesOrientacoesCamara <- function(id){
+
+# url <- "https://dadosabertos.camara.leg.br/api/v2/votacoes/","2251392-38","/orientacoes/"
+  url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id,"/orientacoes/")
+
+  status_code <- 500
+  while(status_code != 200){
+    try(resp <- httr::GET(url, httr::accept_json()))
+    status_code = httr::status_code(resp)
+  }
+  
+  dados <- httr::content(resp,  type = "text", encoding = "UTF-8") %>% 
+    jsonlite::fromJSON() %>%
+    .[["dados"]]
+  
+   if(!is.null(dados)){
+     dados <- dados %>% 
+     dplyr::mutate(rollcall_id = id) %>%
+     dplyr::mutate(bill_id = stringr::str_extract(id, ".+?(?=-)")) %>%
+     dplyr::select(bill_id, rollcall_id, codPartidoBloco, siglaPartidoBloco, orientacaoVoto)
+
+dados <- dados %>%
+ dplyr::mutate(orientation = stringi::stri_trans_general(orientacaoVoto, "Latin-ASCII")) %>%      dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaPartidoBloco, "Latin-ASCII")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^MINORIA$", "Minoria"))  %>%
+  dplyr::mutate(sigla_bancada =  stringr::str_replace_all(sigla_bancada, "^MAIORIA$", "Maioria"))  %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODEMOS|Podemos$", "PODE")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PC do B$|^PC DO B$", "PCdoB")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PCDOB$|^PCDoB$", "PCdoB")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV.$", "Governo")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRI$", "Patriota")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^SDD$", "SOLIDARIEDADE")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Republican$", "REPUBLICANOS")) %>%
+  dplyr::select(
+    bill_id,
+    rollcall_id,
+   sigla_bancada,
+    orientation
+  )
+
+dados %>% tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation, names_prefix = 'ori_') %>% left_join(dados %>% select(-bill_id), by = 'rollcall_id')
+
+  } else {
+    return(NULL)
+  }
+
+}
+NULL
+
+
+
+
+
+#' Fetch deputie's roll-call vote given a roll-call id
+#' 
+#' @param id A string for the rollcall id
+#'
+#' @examples 
+#'  # dat <- fetchVotacoesCamara("2206395-58")
+#' 
+# fetchVotacoesCamara <- function(id){
+#  library(tidyverse)
+  # url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/2206395-58/votos/")
+#  url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id,"/votos/")
+  
+  
+#  tryCatch({
+#    resp <- httr::GET(url, httr::accept_json())
+#    status_code = httr::status_code(resp)
+#    data <- httr::content(resp, type = "text", encoding = "UTF-8") %>% 
+#      jsonlite::fromJSON() %>%
+#      .[["dados"]]
+    
+#    data <- data %>% 
+#      dplyr::mutate(rollcall_id = id) %>%
+#      dplyr::mutate(bill_id = stringr::str_extract(id, ".+?(?=-)")) %>%
+#      dplyr::rename(siglaUf = deputado_.siglaUf, siglaPartido = deputado_.siglaPartido, nome = #deputado_.nome, idParlamentar = deputado_.id) %>%
+#      dplyr::select(bill_id, rollcall_id, codPartido, siglaPartido, siglaUf, nome, tipoVoto, #dataRegistroVoto)
+#  })
+  
+#  return(data)
+# }
