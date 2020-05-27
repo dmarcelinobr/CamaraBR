@@ -52,7 +52,6 @@ voteToRollcall <- function(votes = NULL, legislators = NULL, bills = NULL,
     return(rollCallMatrix)
   }
   
-  
   if(isTRUE(ideal)){
     names <- unlist(dimnames(rollCallMatrix)[1])
     

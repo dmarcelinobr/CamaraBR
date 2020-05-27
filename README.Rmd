@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 ## R package for accessing the Brazilian Chamber of Deputies RESTful API
 
-## Installation
+## Installation 🤞
 
 To get the current development version from Github:
 
@@ -37,7 +37,9 @@ devtools::install_github("danielmarcelino/CamaraBR")
 library(CamaraBR)
 ```
 
-## Usage
+
+## Usage 🙌🚀
+
 
 ### Downloading proposal details 
 ```{r, eval=FALSE}
@@ -110,14 +112,16 @@ orientation %>% count(sigla_bancada)
 ```{r, eval=FALSE}
 # legacy: data <- data %>% filter(type_bill == "MPV", number_bill == 897, year_bill == 2019 )
 # data <- buildRollcallDataset(year = 1999)
-library(CamaraBR)
+# 
+library(CamaraBR);
+library(dplyr)
 
 data <- buildRollcallDataset(year = 2019)
 
 
 # Votações válidas no ano para o nosso cálculo
 data %>%
-  # filter(!is.na(ori_GOV)) %>%
+  # filter(!is.na(Governo)) %>%
   distinct(rollcall_id) %>%
   nrow()
 
@@ -126,7 +130,7 @@ data %>%
 data %>%
   filter(legislator_vote %in% c("Nao", "Obstrução","Sim")) %>%
   filter(!is.na(legislator_vote)) %>%
-  count(ori_GOV)
+  count(Governo)
 
 ```
 
@@ -134,17 +138,16 @@ data %>%
 ### Transform the dataset for analysis
 
 ```{r, eval=FALSE}
-siglaTipo = c("PEC", "PL", "PLP")
+#vsiglaTipo = c("PEC", "PL", "PLP")
 
 
-# Limpando a base
-base <- transformVotes(data, filter = FALSE)
+base <- transformVotes(data, filter = FALSE) # considers every plenary rollcall  
 
 base2 <- transformVotes(data, filter = TRUE) # only considers rollcall with gov orientation
 
 
 base %>%
-  # filter(!is.na(ori_GOV)) %>%
+  # filter(!is.na(Governo)) %>%
   distinct(rollcall_id) %>%
   nrow()
 

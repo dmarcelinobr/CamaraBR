@@ -1,4 +1,4 @@
-if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "decision_time", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao", "ori_Governo", "ori_GOV", "ori_Oposicao", "ori_Minoria", "ori_Maioria", "proposicao_ano", "proposicao_ementa", "proposicao_siglaTipo", "proposicao_titulo", "proposicao_id", "proposicao_numero", "bill_name", "dataRegistroVoto", "codPartidoBloco", "codPartido", "siglaPartidoBloco", "orientacaoVoto", "tipoVoto"))
+if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill", "year_bill", "number_bill", "rollcall_keywords", "rollcall_subject", "rollcall_id", "legislator_id", "decision_time", "legislator_name", "legislator_party", "legislator_state", "legislator_vote", "uri_votacao", "orientation", "decision_summary", "sigla_bancada", "sigla_orgao", ".proposals ", ".file", ".votacoesOrientacoes", ".votacoesVotos", "siglaTipo", "id", "siglaTipo", "ementa", "numero", "keywords", "dataHoraVoto", "idVotacao", "deputado_id", "deputado_nome", "deputado_siglaUf", "deputado_siglaPartido", "orientacao", "descricao", "siglaOrgao", "siglaBancada", "voto", "uriVotacao", "proposicao_ano", "proposicao_ementa", "proposicao_siglaTipo", "proposicao_titulo", "proposicao_id", "proposicao_numero", "bill_name", "dataRegistroVoto", "codPartidoBloco", "codPartido", "siglaPartidoBloco", "orientacaoVoto", "tipoVoto", "deputado_"))
 
 #' Load deputie's roll-call votes 
 #'
@@ -104,23 +104,19 @@ NULL
     dplyr::mutate(orientacao = stringi::stri_trans_general(orientacao, "Latin-ASCII")) %>%   dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaBancada, "Latin-ASCII")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^MINORIA$", "Minoria"))  %>%
     dplyr::mutate(sigla_bancada =  stringr::str_replace_all(sigla_bancada, "^MAIORIA$", "Maioria"))  %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^AVANTE$", "Avante"))  %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada,  "^CIDADANIA$", "Cidadania")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODEMOS$", "Podemos")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODE$", "Podemos")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^REDE$", "Rede")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODEMOS$", "PODE")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Podemos$", "PODE")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Rede$", "REDE")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PC do B$|^PC DO B$", "PCdoB")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PCDOB$|^PCDoB$", "PCdoB")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV.$", "Governo")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^NOVO$", "Novo")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRIOTA$", "Patriota")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRI$", "Patriota")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^NOVO$", "Novo")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRIOTA$", "PATRI")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Patriota$", "PATRI")) %>%
     dplyr::mutate(
-      sigla_bancada = stringr::str_replace_all(sigla_bancada, "^SOLIDARIEDADE$", "Solidaried")
+      sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Solidaried$", "SOLIDARIEDADE")
     ) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^SDD$", "Solidaried")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^REPUBLICANO$", "Republican")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^SDD$", "SOLIDARIEDADE")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Republican$", "REPUBLICANO")) %>%
     dplyr::mutate(bill_id = stringr::str_extract(idVotacao, ".+?(?=-)")) %>%
     dplyr::rename(
       rollcall_id = idVotacao,
@@ -139,7 +135,7 @@ NULL
       )
   
   .data <- .votacoesOrientacoes %>%
-    tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation, names_prefix = 'ori_') %>% left_join(.votacoesOrientacoes %>% select(-bill_id, -sigla_orgao, -decision_summary), by = 'rollcall_id')
+    tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation) %>% left_join(.votacoesOrientacoes %>% select(-bill_id, -sigla_orgao, -decision_summary), by = 'rollcall_id')
   
   return(.data)
 }
@@ -259,7 +255,7 @@ NULL
 fetchVotacoesOrientacoesCamara <- function(id){
 
 # url <- "https://dadosabertos.camara.leg.br/api/v2/votacoes/","2251392-38","/orientacoes/"
-  url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id,"/orientacoes/")
+url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id,"/orientacoes/")
 
   status_code <- 500
   while(status_code != 200){
@@ -271,7 +267,7 @@ fetchVotacoesOrientacoesCamara <- function(id){
     jsonlite::fromJSON() %>%
     .[["dados"]]
   
-   if(!is.null(dados)){
+   if(!is.null(dados) || !is.na(dados)){
      dados <- dados %>% 
      dplyr::mutate(rollcall_id = id) %>%
      dplyr::mutate(bill_id = stringr::str_extract(id, ".+?(?=-)")) %>%
@@ -295,7 +291,7 @@ dados <- dados %>%
     orientation
   )
 
-dados %>% tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation, names_prefix = 'ori_') %>% left_join(dados %>% select(-bill_id), by = 'rollcall_id')
+dados %>% tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation) %>% left_join(dados %>% select(-bill_id), by = 'rollcall_id')
 
   } else {
     return(NULL)
@@ -311,29 +307,48 @@ NULL
 #' Fetch deputie's roll-call vote given a roll-call id
 #' 
 #' @param id A string for the rollcall id
-#'
-#' @examples 
-#'  # dat <- fetchVotacoesCamara("2206395-58")
+#' @importFrom dplyr transmute
+#' @importFrom jsonlite fromJSON
+#' @importFrom httr GET
+#' @importFrom httr content
+#' @importFrom httr status_code
+#' @importFrom httr accept_json
+#' @importFrom magrittr %>%
 #' 
-# fetchVotacoesCamara <- function(id){
-#  library(tidyverse)
+#' @examples 
+#'  dat <- fetchVotacoesCamara("2206395-58")
+#' 
+#' @rdname fetchVotacoesCamaras
+#' @export
+ fetchVotacoesCamara <- function(id){
   # url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/2206395-58/votos/")
-#  url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id,"/votos/")
+
+url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id,"/votos/")
+
+status_code <- 500
+   while(status_code != 200){
+     try(resp <- httr::GET(url, httr::accept_json()))
+     status_code = httr::status_code(resp)
+   }
+   
+ dados <- httr::content(resp,  type = "text", encoding = "UTF-8") %>% 
+     jsonlite::fromJSON() %>%
+     .[["dados"]]
+
+if(!is.null(dados) || !is.na(dados)){
   
-  
-#  tryCatch({
-#    resp <- httr::GET(url, httr::accept_json())
-#    status_code = httr::status_code(resp)
-#    data <- httr::content(resp, type = "text", encoding = "UTF-8") %>% 
-#      jsonlite::fromJSON() %>%
-#      .[["dados"]]
-    
-#    data <- data %>% 
-#      dplyr::mutate(rollcall_id = id) %>%
-#      dplyr::mutate(bill_id = stringr::str_extract(id, ".+?(?=-)")) %>%
-#      dplyr::rename(siglaUf = deputado_.siglaUf, siglaPartido = deputado_.siglaPartido, nome = #deputado_.nome, idParlamentar = deputado_.id) %>%
-#      dplyr::select(bill_id, rollcall_id, codPartido, siglaPartido, siglaUf, nome, tipoVoto, #dataRegistroVoto)
-#  })
-  
-#  return(data)
-# }
+dados %>% 
+dplyr::transmute(rollcall_id = id,
+                 decision_date = dataRegistroVoto,
+                 decision_time = dataRegistroVoto, 
+                 legislature_id = deputado_$idLegislatura,
+                 legislator_id = deputado_$id,
+                 legislator_name = deputado_$nome,
+                 legislator_party = deputado_$siglaPartido,
+                 legislator_state = deputado_$siglaUf,
+                 legislator_vote = tipoVoto)
+ } else {
+return(NULL)
+ }
+}
+NULL

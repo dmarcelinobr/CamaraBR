@@ -11,7 +11,7 @@ Status](https://travis-ci.org/danielmarcelino/CamaraBR.svg?branch=master)](https
 
 ## R package for accessing the Brazilian Chamber of Deputies RESTful API
 
-## Installation
+## Installation 🤞
 
 To get the current development version from Github:
 
@@ -26,7 +26,7 @@ devtools::install_github("danielmarcelino/CamaraBR")
 library(CamaraBR)
 ```
 
-## Usage
+## Usage 🙌🚀
 
 ### Downloading proposal details
 
@@ -57,6 +57,8 @@ proposals %>% count(type_bill)
 ### Downloading legislator rollcall vote details
 
 ``` r
+library(CamaraBR)
+library(progress)
 
 anos = 2003:2020
 
@@ -75,6 +77,7 @@ rollcall %>% count(legislator_party)
 ### Downloading rollcall vote orientations
 
 ``` r
+library(CamaraBR)
 
 anos = 2019:2020
 
@@ -94,6 +97,7 @@ orientation %>% count(sigla_bancada)
 ``` r
 # legacy: data <- data %>% filter(type_bill == "MPV", number_bill == 897, year_bill == 2019 )
 # data <- buildRollcallDataset(year = 1999)
+library(CamaraBR)
 
 data <- buildRollcallDataset(year = 2019)
 
@@ -109,7 +113,7 @@ data %>%
 data %>%
   filter(legislator_vote %in% c("Nao", "Obstrução","Sim")) %>%
   filter(!is.na(legislator_vote)) %>%
-  count(ori_GOV)
+  count(Governo)
 ```
 
 ### Transform the dataset for analysis

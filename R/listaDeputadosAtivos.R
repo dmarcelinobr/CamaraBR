@@ -25,11 +25,12 @@ listaDeputadosAtivos <- function(url="https://dadosabertos.camara.leg.br/api/v2/
     return(NULL)
   }
   
-  .dados <- .dados %>%
-    dplyr::select(legislator_id = id,
+.dados <- .dados %>%
+    dplyr::transmute(legislator_id = as.character(id),
            legislator_cham_name = nome,
            legislator_party = siglaPartido,
            legislator_state = siglaUf) %>%
-    dplyr::mutate(legislator_id = as.character(legislator_id)) %>%
     dplyr::mutate_if(is.factor, as.character)
+
+return(.dados)
 }

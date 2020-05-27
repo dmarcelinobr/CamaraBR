@@ -18,22 +18,25 @@ transformVotes <- function(.data,  filter = FALSE) {
     stop("Need a data frame to perform vote transformation")
   }
 
-.data <- dplyr::mutate(.data, ori_Governo = stringi::stri_trans_general(ori_Governo, "Latin-ASCII"))
+.data <- dplyr::mutate(.data, Governo = stringi::stri_trans_general(Governo, "Latin-ASCII"))
+
 .data <- dplyr::mutate(.data, legislator_vote = stringi::stri_trans_general(legislator_vote, "Latin-ASCII"))
 
-.data <- dplyr::mutate(.data, ori_Governo = ifelse(ori_Governo == "Sim", 1, 
-                                        ifelse(ori_Governo == "Nao", 0, 
-                                          ifelse(ori_Governo == "Liberado", NA_integer_, ori_Governo)))) 
+.data <- dplyr::mutate(.data, Governo = ifelse(Governo == "Sim", 1, 
+                                        ifelse(Governo == "Nao", 0, 
+                                        ifelse(Governo == "Liberado", NA_integer_, Governo))) %>% as.integer()) 
 
 .data <- dplyr::mutate(.data, legislator_vote = ifelse(legislator_vote == "Sim", 1, 
                                     ifelse(legislator_vote == "Nao", 0, 
-ifelse( (legislator_vote == "Obstrucao" && !is.na(ori_Governo) ), 
-        abs(ori_Governo - 1), legislator_vote))))
-  if (filter) {
-.data <- dplyr::filter(.data, ori_Governo == "1" | ori_Governo == "0", legislator_vote == "0" |
-legislator_vote == "1")
-  }
-.data <- dplyr::mutate(.data, governismo = ifelse(ori_Governo == legislator_vote, 1, 0))
-return(.data)
+ifelse( (legislator_vote == "Obstrucao" && !is.na(Governo) ), 
+        abs(Governo - 1), legislator_vote))) %>% as.integer())
+
+if (filter) {
+.dados <- .data %>% dplyr::filter(Governo == 1 | Governo == "1" | Governo == 0 | Governo == "0")
+}
+
+.dados <- dplyr::mutate(.data, governismo = ifelse(Governo == legislator_vote, 1, 0))
+
+return(.dados)
 }
 NULL
