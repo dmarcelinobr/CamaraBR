@@ -104,14 +104,14 @@ NULL
     dplyr::mutate(orientacao = stringi::stri_trans_general(orientacao, "Latin-ASCII")) %>%   dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaBancada, "Latin-ASCII")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^MINORIA$", "Minoria"))  %>%
     dplyr::mutate(sigla_bancada =  stringr::str_replace_all(sigla_bancada, "^MAIORIA$", "Maioria"))  %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODEMOS$", "PODE")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Podemos$", "PODE")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Rede$", "REDE")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODEMOS", "PODE")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Podemos", "PODE")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Rede", "REDE")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PC do B$|^PC DO B$", "PCdoB")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PCDOB$|^PCDoB$", "PCdoB")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV.$", "Governo")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRIOTA$", "PATRI")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Patriota$", "PATRI")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRIOTA", "PATRI")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Patriota", "PATRI")) %>%
     dplyr::mutate(
       sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Solidaried$", "SOLIDARIEDADE")
     ) %>%
@@ -135,7 +135,9 @@ NULL
       )
   
   .data <- .votacoesOrientacoes %>%
-    tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation) %>% left_join(.votacoesOrientacoes %>% select(-bill_id, -sigla_orgao, -decision_summary), by = 'rollcall_id')
+tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation) %>% 
+    dplyr::left_join(.votacoesOrientacoes %>% 
+                       dplyr::select(-bill_id, -sigla_orgao), by = 'rollcall_id')
   
   return(.data)
 }
@@ -277,18 +279,18 @@ dados <- dados %>%
  dplyr::mutate(orientation = stringi::stri_trans_general(orientacaoVoto, "Latin-ASCII")) %>%      dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaPartidoBloco, "Latin-ASCII")) %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^MINORIA$", "Minoria"))  %>%
   dplyr::mutate(sigla_bancada =  stringr::str_replace_all(sigla_bancada, "^MAIORIA$", "Maioria"))  %>%
-  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODEMOS|Podemos$", "PODE")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODEMOS|Podemos", "PODE")) %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PC do B$|^PC DO B$", "PCdoB")) %>%
-  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PCDOB$|^PCDoB$", "PCdoB")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PCDOB|^PCDoB", "PCdoB")) %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV.$", "Governo")) %>%
-  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRI$", "Patriota")) %>%
+  dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "Patriota", "PATRI")) %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^SDD$", "SOLIDARIEDADE")) %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Republican$", "REPUBLICANOS")) %>%
   dplyr::select(
     bill_id,
     rollcall_id,
    sigla_bancada,
-    orientation
+   orientation
   )
 
 dados %>% tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation) %>% left_join(dados %>% select(-bill_id), by = 'rollcall_id')
