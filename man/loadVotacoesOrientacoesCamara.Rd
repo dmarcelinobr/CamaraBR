@@ -13,7 +13,9 @@ loadVotacoesOrientacoesCamara(year)
 Load orietation of deputie's roll-call votes
 }
 \examples{
+\dontrun{
 
 # dados2 <- loadVotacoesOrientacoesCamara(2020)
+}
 
 }

@@ -13,7 +13,8 @@ fetchVotacoesOrientacoesCamara(id)
 Fetch roll-call party/bloc vote orientation
 }
 \examples{
-
+\dontrun{
  dat <- fetchVotacoesOrientacoesCamara("2206395-58")
+ }
  
 }

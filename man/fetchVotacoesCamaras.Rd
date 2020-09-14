@@ -13,6 +13,8 @@ fetchVotacoesCamara(id)
 Fetch deputie's roll-call vote given a roll-call id
 }
 \examples{
+\dontrun{
  dat <- fetchVotacoesCamara("2206395-58")
+}
 
 }

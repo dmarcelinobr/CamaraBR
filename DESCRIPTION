@@ -1,7 +1,7 @@
 Package: CamaraBR
 Type: Package
 Title: Download, Unpack and Tidy Legislative Data from the Brazilian Chamber of Deputies
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: c(
     person(given = "Daniel", family = "Marcelino", email = "dmarcelino@live.com", role = c("aut", "cre"))
     )
@@ -30,10 +30,9 @@ Imports:
     tibble (>= 3.0.1),
     pscl (>= 1.5.5),
     glue (>= 1.4.0)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests: 
     devtools,
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-

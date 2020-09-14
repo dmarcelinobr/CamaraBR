@@ -14,6 +14,8 @@ Load deputie's roll-call votes
 }
 \examples{
 
+\dontrun{
 # dados1 <- loadCamaraVotes(2020)
+}
 
 }
