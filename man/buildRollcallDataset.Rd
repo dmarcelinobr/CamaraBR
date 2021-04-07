@@ -5,7 +5,7 @@
 \title{Fetch bills discussed and voted on the plenary}
 \usage{
 buildRollcallDataset(
-  year = 2020,
+  year = 2021,
   type = "",
   download = TRUE,
   ascii = FALSE,
@@ -27,6 +27,6 @@ buildRollcallDataset(
 Fetch bills discussed and voted on the plenary
 }
 \examples{
-data <- buildRollcallDataset(year=2020)
+data <- buildRollcallDataset(year = 2021)
 
 }

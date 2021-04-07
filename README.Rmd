@@ -48,7 +48,7 @@ library(tidyverse)
 library(CamaraBR)
 library(progress);
 
-anos = 1988:2020
+anos = 1988:2021
 
 barra <- progress_bar$new(total = length(anos), 
                           format = "[:bar] :percent eta: :eta")
@@ -74,7 +74,7 @@ proposals %>% count(type_bill)
 library(CamaraBR)
 library(progress)
 
-anos = 2003:2020
+anos = 2003:2021
 
 barra <- progress_bar$new(total = length(anos), 
                           format = "[:bar] :percent eta: :eta")
@@ -94,7 +94,7 @@ rollcall %>% count(legislator_party)
 ```{r, eval=FALSE}
 library(CamaraBR)
 
-anos = 2019:2020
+anos = 2019:2021
 
 orientation <- purrr::map_df(anos, ~{
                            loadVotacoesOrientacoesCamara(.x)
@@ -113,11 +113,11 @@ orientation %>% count(sigla_bancada)
 ```{r, eval=FALSE}
 # legacy: data <- data %>% filter(type_bill == "MPV", number_bill == 897, year_bill == 2019 )
 # data <- buildRollcallDataset(year = 1999)
-# 
+
 library(CamaraBR);
 library(dplyr)
 
-data <- buildRollcallDataset(year = 2019)
+data <- buildRollcallDataset(year = 2021)
 
 
 # Votações válidas no ano para o nosso cálculo

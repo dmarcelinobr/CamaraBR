@@ -30,11 +30,11 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c(".votacoesPlenarioCamar
 #' @importFrom rlang quo_name
 #' @importFrom utils data
 #' @examples 
-#' data <- buildRollcallDataset(year=2020)
+#' data <- buildRollcallDataset(year = 2021)
 #' 
 #' @export
 #' @rdname buildRollcallDataset
-buildRollcallDataset <- function (year = 2020, type = "", download = TRUE, ascii = FALSE, filter = TRUE) {
+buildRollcallDataset <- function (year = 2021, type = "", download = TRUE, ascii = FALSE, filter = TRUE) {
 
   "This function lists every bill voted on in plenary."
   if (is.null(year)) {
@@ -58,7 +58,7 @@ ids <- .votacoesPlenarioVotos %>%
   dplyr::pull(rollcall_id) %>% unique()
 
 
-.votacoesPlenarioCamara <- data.frame()
+.votacoesPlenarioCamara <- tibble()
 
 for(i in ids) {
   dat <- fetchVotacoesOrientacoesCamara(i)
@@ -66,11 +66,11 @@ for(i in ids) {
   message(paste0("\nFetching vote orientation of ", i))
 }
 
+# To be implemented
 # in case the API is not working, you can still try download from the repository
 # .votacoesPlenarioCamara <- loadVotacoesOrientacoesCamara(year);
 
-
-.votacoesPlenarioVotos <- dplyr::full_join(.votacoesPlenarioCamara, .votacoesPlenarioVotos) %>%
+.votacoesPlenarioVotos <- dplyr::full_join(.votacoesPlenarioCamara, .votacoesPlenarioVotos) %>% 
   dplyr::distinct(rollcall_id, legislator_id, .keep_all = TRUE)
 
 .data <- dplyr::left_join(.votacoesPlenarioVotos, .proposalDetails) %>% 
@@ -78,7 +78,8 @@ for(i in ids) {
 dplyr::mutate(legislator_vote = ifelse(legislator_vote == "", NA, legislator_vote)) %>%
 dplyr::select(bill_name, bill_id, rollcall_id, type_bill, number_bill, year_bill, decision_date, decision_time, rollcall_subject, legislator_id, legislator_name, legislator_party, legislator_state, legislator_vote, orientation, Governo, everything()) 
 # decision_summary, sigla_orgao
-# 
+
+
 if (filter == TRUE) {
 .data <- dplyr::filter(.data, type_bill %in% c("PL", "PEC", "PLP", "MPV", "REQ", "REC", "PRC", "PDC", "PDL", "PLN", "PFC", "PLV", "PLC", "CMC"))
 #  sigla_orgao == "PLEN" 

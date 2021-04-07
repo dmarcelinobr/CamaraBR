@@ -7,7 +7,9 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(c("bill_id", "type_bill",
 #'
 #' @examples 
 #' 
+#' \dontrun{
 #' # dados1 <- loadCamaraVotes(2020)
+#'}
 #'
 #' @importFrom purrr map_df
 #' @importFrom tibble tibble
@@ -62,8 +64,10 @@ NULL
 #' @param year An integer
 #'
 #' @examples
+#' \dontrun{
 #'
 #' # dados2 <- loadVotacoesOrientacoesCamara(2020)
+#'}
 #'
 #' @importFrom data.table fread
 #' @importFrom tibble tibble
@@ -155,8 +159,9 @@ NULL
 #' @param year An integer
 #'
 #' @examples
+#' \dontrun{
 #' # dados3 <- loadVotacoesCamara(2020)
-#'
+#'}
 #' @importFrom data.table fread
 #' @importFrom tibble tibble
 #' @importFrom purrr map_df
@@ -233,11 +238,12 @@ NULL
 #' Fetch roll-call party/bloc vote orientation 
 #' 
 #' @param id A string for the roll-call id
-#'
-#'
+#' 
+#' 
 #' @examples 
-#'
+#' \dontrun{
 #'  dat <- fetchVotacoesOrientacoesCamara("2206395-58")
+#'  }
 #'  
 #' @importFrom tibble tibble
 #' @importFrom magrittr "%>%"
@@ -256,7 +262,9 @@ NULL
 #' @export 
 fetchVotacoesOrientacoesCamara <- function(id){
 
-# url <- "https://dadosabertos.camara.leg.br/api/v2/votacoes/","2251392-38","/orientacoes/"
+# url <- "https://dadosabertos.camara.leg.br/api/v2/votacoes/2127681-64/orientacoes/"
+# url <- "https://dadosabertos.camara.leg.br/api/v2/votacoes/2251392-38/orientacoes/"
+# 
 url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id,"/orientacoes/")
 
   status_code <- 500
@@ -265,18 +273,21 @@ url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id,"/orienta
     status_code = httr::status_code(resp)
   }
   
-  dados <- httr::content(resp,  type = "text", encoding = "UTF-8") %>% 
-    jsonlite::fromJSON() %>%
-    .[["dados"]]
+  parsed <- httr::content(resp,  type = "text", encoding = "UTF-8") %>% 
+    jsonlite::fromJSON() %>% .[["dados"]]
   
-   if(!is.null(dados) || !is.na(dados)){
-     dados <- dados %>% 
-     dplyr::mutate(rollcall_id = id) %>%
-     dplyr::mutate(bill_id = stringr::str_extract(id, ".+?(?=-)")) %>%
-     dplyr::select(bill_id, rollcall_id, codPartidoBloco, siglaPartidoBloco, orientacaoVoto)
+if(!is.null(parsed) & class(parsed) != "NULL" & class(parsed) != "logical" & length(parsed) != 0){
+     dados <- parsed %>% 
+     dplyr::transmute(rollcall_id = id,
+                   bill_id = stringr::str_extract(id, ".+?(?=-)"),
+                   codPartidoBloco = codPartidoBloco,
+                   siglaPartidoBloco = siglaPartidoBloco,
+                   orientacaoVoto = orientacaoVoto) 
+     
 
 dados <- dados %>%
- dplyr::mutate(orientation = stringi::stri_trans_general(orientacaoVoto, "Latin-ASCII")) %>%      dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaPartidoBloco, "Latin-ASCII")) %>%
+ dplyr::mutate(orientation = stringi::stri_trans_general(orientacaoVoto, "Latin-ASCII")) %>%
+  dplyr::mutate(sigla_bancada = stringi::stri_trans_general(siglaPartidoBloco, "Latin-ASCII")) %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^MINORIA$", "Minoria"))  %>%
   dplyr::mutate(sigla_bancada =  stringr::str_replace_all(sigla_bancada, "^MAIORIA$", "Maioria"))  %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PODEMOS|Podemos", "PODE")) %>%
@@ -286,19 +297,14 @@ dados <- dados %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "Patriota", "PATRI")) %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^SDD$", "SOLIDARIEDADE")) %>%
   dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Republican$", "REPUBLICANOS")) %>%
-  dplyr::select(
-    bill_id,
-    rollcall_id,
-   sigla_bancada,
-   orientation
-  )
+  dplyr::select(bill_id, rollcall_id, sigla_bancada, orientation)
 
 dados %>% tidyr::pivot_wider(names_from = sigla_bancada, values_from = orientation) %>% left_join(dados %>% select(-bill_id), by = 'rollcall_id')
 
   } else {
-    return(NULL)
-  }
-
+dados <- tibble()
+dados
+}
 }
 NULL
 
@@ -313,43 +319,48 @@ NULL
 #' @importFrom jsonlite fromJSON
 #' @importFrom httr GET
 #' @importFrom httr content
+#' @importFrom httr http_type
 #' @importFrom httr status_code
 #' @importFrom httr accept_json
 #' @importFrom magrittr %>%
 #' 
 #' @examples 
+#' \dontrun{
 #'  dat <- fetchVotacoesCamara("2206395-58")
+#' }
 #' 
 #' @rdname fetchVotacoesCamaras
 #' @export
  fetchVotacoesCamara <- function(id){
-  # url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/2206395-58/votos/")
 
-url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id,"/votos/")
+path = "/votos/" 
+
+url <- paste0("https://dadosabertos.camara.leg.br/api/v2/votacoes/",id, path)
 
 status_code <- 500
-   while(status_code != 200){
-     try(resp <- httr::GET(url, httr::accept_json()))
-     status_code = httr::status_code(resp)
-   }
-   
- dados <- httr::content(resp,  type = "text", encoding = "UTF-8") %>% 
-     jsonlite::fromJSON() %>%
-     .[["dados"]]
+while(status_code != 200){
+  try(resp <- httr::GET(url, httr::accept_json()))
+  status_code = httr::status_code(resp)
+}
 
-if(!is.null(dados) || !is.na(dados)){
-  
-dados %>% 
+parsed <- httr::content(resp, type = "text", encoding = "UTF-8") %>% 
+  jsonlite::fromJSON() %>% .[["dados"]]
+
+
+if(!is.null(parsed) || !is.na(parsed)){
+
+parsed %>% 
 dplyr::transmute(rollcall_id = id,
-                 decision_date = dataRegistroVoto,
+                 decision_date =  dataRegistroVoto,
                  decision_time = dataRegistroVoto, 
                  legislature_id = deputado_$idLegislatura,
-                 legislator_id = deputado_$id,
+                 legislator_id =  deputado_$id,
                  legislator_name = deputado_$nome,
                  legislator_party = deputado_$siglaPartido,
                  legislator_state = deputado_$siglaUf,
                  legislator_vote = tipoVoto)
  } else {
+   
 return(NULL)
  }
 }
