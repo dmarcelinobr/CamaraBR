@@ -36,6 +36,8 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
 devtools::install_github("danielmarcelino/CamaraBR")
 ## load CamaraBR package
 library(CamaraBR)
+
+if(packageVersion("CamaraBR") > "0.0.5") { print("Package: OK!\n") }
 ```
 
 

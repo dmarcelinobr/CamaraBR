@@ -16,5 +16,5 @@ Fetch roll-call party/bloc vote orientation
 \dontrun{
  dat <- fetchVotacoesOrientacoesCamara("2206395-58")
  }
- 
+
 }
