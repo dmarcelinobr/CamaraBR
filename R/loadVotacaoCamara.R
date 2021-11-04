@@ -187,13 +187,17 @@ NULL
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PC do B$|^PC DO B$", "PCdoB")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PCDOB$|^PCDoB$", "PCdoB")) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^GOV.$", "Governo")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRIOTA", "PATRI")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Patriota", "PATRI")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^PATRI$", "PATRIOTA")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Patriota", "PATRIOTA")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Cidadania", "CIDADANIA")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Avante", "AVANTE")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Novo", "NOVO")) %>%
     dplyr::mutate(
       sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Solidaried$", "SOLIDARIEDADE")
     ) %>%
     dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^SDD$", "SOLIDARIEDADE")) %>%
-    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Republican$", "REPUBLICANO")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Republican$", "REPUBLICANOS")) %>%
+    dplyr::mutate(sigla_bancada = stringr::str_replace_all(sigla_bancada, "^Republicanos$", "REPUBLICANOS")) %>%
     dplyr::mutate(bill_id = stringr::str_extract(idVotacao, ".+?(?=-)")) %>%
     dplyr::rename(
       rollcall_id = idVotacao,

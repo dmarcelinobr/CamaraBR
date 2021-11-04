@@ -27,7 +27,6 @@ if (getRversion() >= "2.15.1")
 #' @importFrom purrr map_df
 #' @importFrom magrittr "%>%"
 #' @importFrom dplyr mutate_if
-#' @importFrom dplyr bind_rows
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
 #' @importFrom dplyr rename
@@ -63,6 +62,7 @@ buildRollcallDataset <- function (year = 2021,
   }
   
   if (download == TRUE) {
+    
     .proposalDetails <- loadCamaraProposals(year)
     # .proposalDetails <- purrr::map_df(1988:year,~{loadCamaraProposals(.x)})
   }
@@ -80,6 +80,7 @@ buildRollcallDataset <- function (year = 2021,
   
   for (i in ids) {
     dat <- fetchVotacoesOrientacoesCamara(i)
+    
     .votacoesPlenarioCamara <-
       dplyr::bind_rows(.votacoesPlenarioCamara, dat)
     message(paste0("\nFetching vote orientation of ", i))

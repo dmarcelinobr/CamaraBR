@@ -37,7 +37,7 @@ devtools::install_github("danielmarcelino/CamaraBR")
 ## load CamaraBR package
 library(CamaraBR)
 
-if(packageVersion("CamaraBR") > "0.0.5") { print("Package: OK!\n") }
+if(packageVersion("CamaraBR") > "0.0.7") { print("Package: OK!\n") }
 ```
 
 
@@ -76,7 +76,7 @@ proposals %>% count(type_bill)
 library(CamaraBR)
 library(progress)
 
-anos = 2003:2021
+anos = 2019:2021
 
 barra <- progress_bar$new(total = length(anos), 
                           format = "[:bar] :percent eta: :eta")
@@ -130,8 +130,8 @@ data %>%
 
 
 data %>%
-  filter(legislator_vote %in% c("Nao", "Obstrução","Sim")) %>%
-  filter(!is.na(legislator_vote)) %>%
+  dplyr::filter(legislator_vote %in% c("Nao", "Obstrução","Sim")) %>%
+  dplyr::filter(!is.na(legislator_vote)) %>%
   count(Governo)
 
 ```
